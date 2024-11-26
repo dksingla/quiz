@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Quiz from 'react-quiz-component';
+import './Quiz.css';  // Import custom styles for the quiz
 
-export const quiz =  {
-  
+// Your quiz object (same as the one you provided)
+export const quiz = {
+  "quizTitle": "React Quiz Component Demo",
+  "quizSynopsis": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim",
+  "progressBarColor": "#9de1f6", 
+  "nrOfQuestions": "4",
   "questions": [
     {
       "question": "How can you access the state of a component from inside of a member function?",
       "questionType": "text",
-      "questionPic": "https://dummyimage.com/600x400/000/fff&text=X", // if you need to display Picture in Question
+      "questionPic": "https://dummyimage.com/600x400/000/fff&text=X",
       "answerSelectionType": "single",
       "answers": [
         "this.getState()",
@@ -83,27 +88,41 @@ export const quiz =  {
     {
       "question": "What are the advantages of React JS?",
       "questionType": "text",
-      "answerSelectionType": "single",
+      "answerSelectionType": "multiple",
       "answers": [
         "React can be used on client and as well as server side too",
         "Using React increases readability and makes maintainability easier. Component, Data patterns improves readability and thus makes it easier for manitaining larger apps",
         "React components have lifecycle events that fall into State/Property Updates",
         "React can be used with any other framework (Backbone.js, Angular.js) as it is only a view layer"
       ],
-      "correctAnswer": 4,
+      "correctAnswer": [1, 2, 4],
       "messageForCorrectAnswer": "Correct answer. Good job.",
       "messageForIncorrectAnswer": "Incorrect answer. Please try again.",
       "explanation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
       "point": "20"
     },
   ]
-} 
+}
+
+// Function to handle quiz completion
+const setQuizResult = (obj: any) => {
+  console.log(obj);
+}
 
 const Quizpage = () => {
+  
   return (
-    <div className='flex justify-center items-center pt-10'>
-      
-      <Quiz quiz={quiz} shuffle={true} shuffleAnswer={true} disableSynopsis	={true}/>
+    <div className='quiz-container flex justify-center items-center pt-10'>
+      <Quiz 
+        quiz={quiz} 
+        shuffle={true} 
+        shuffleAnswer={true} 
+        disableSynopsis={true}
+        showDefaultResult={false}  // Optional: Disable custom result page for now
+        onComplete={setQuizResult}
+        timer={60}
+        enableProgressBar={true}
+      />
     </div>
   );
 };
