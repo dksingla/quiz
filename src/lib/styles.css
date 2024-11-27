@@ -90,13 +90,14 @@
 }
 
 .radio-container {
+  padding-top: 20px;
   display: flex;
   flex-direction: row;
   gap: 20px;
   /* justify-content: center; */
   align-items: center;
   justify-items: center;
-  margin-bottom: 50px;
+  /* margin-bottom: 50px; */
 }
 
 .react-quiz-container .selected {
@@ -125,7 +126,7 @@
   opacity: 0.8;
   color: rgba(0, 0, 0, 0.9);
   margin: 0px;
-  padding: 10px;
+  padding: 20px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }

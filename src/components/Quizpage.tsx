@@ -35,6 +35,14 @@ const Quizpage = () => {
       className="quiz-container w-screen h-screen flex flex-col justify-start items-center pt-20 text-white font-bold"
       style={{ backgroundColor: backgroundColor, transition: 'background-color 0.3s ease-in-out' }}
     >
+
+      <div className='uppercase text-3xl'>
+        VRAGG 1 VAN 45
+      </div>
+      <div className='h-2 bg-white w-[95vw] m-5'>
+
+      </div>
+
       {quizResult ? (
         <ResultPage obj={quizResult} />
       ) : (

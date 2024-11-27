@@ -245,7 +245,7 @@ function Quiz({
           onQuestionSubmit={onQuestionSubmit}
           timer={timer}
           allowPauseTimer={allowPauseTimer}
-          // enableProgressBar={enableProgressBar}
+          enableProgressBar={enableProgressBar}
           progressBarColor={quiz.progressBarColor}
         />
       )}

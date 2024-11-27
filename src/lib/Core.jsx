@@ -8,6 +8,9 @@ import { checkAnswer, selectAnswer, rawMarkup } from './core-components/helpers'
 import InstantFeedback from './core-components/InstantFeedback';
 import Explanation from './core-components/Explanation';
 
+
+
+
 function Core({
   questions, appLocale, showDefaultResult, onComplete, customResultPage,
   showInstantFeedback, continueTillCorrect, revealAnswerOnSubmit, allowNavigation,
@@ -34,6 +37,41 @@ function Core({
   const [questionSummary, setQuestionSummary] = useState(undefined);
   const [timeRemaining, setTimeRemaining] = useState(timer);
   const [isRunning, setIsRunning] = useState(true);
+
+
+
+  // progressbartiming logic
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+
+  // Start the timer when the component mounts
+  useEffect(() => {
+    if (timeLeft === 0) {
+      nextQuestion(currentQuestionIndex)
+      setTimeLeft(60);
+
+    };  // If time is up, stop the timer
+
+    const timer = setInterval(() => {
+      setTimeLeft(prevTime => {
+        if (prevTime === 1) {
+          clearInterval(timer); // Stop the timer when it reaches 0
+          // setQuizCompleted(true); // Mark quiz as completed
+        }
+        return prevTime - 1;
+      });
+    }, 1000); // Decrease every second
+
+    // Cleanup the interval on unmount or when timeLeft changes
+    return () => clearInterval(timer);
+  }, [timeLeft]); // Re-run effect when timeLeft changes
+
+  // Calculate progress bar width based on timeLeft
+  const progressBarWidth = (timeLeft / 60) * 100;
+
+
+
+
 
   useEffect(() => {
     setShowDefaultResult(showDefaultResult !== undefined ? showDefaultResult : true);
@@ -388,19 +426,7 @@ function Core({
 
   return (
     <div className="questionWrapper">
-      {enableProgressBar && (
-        <>
-          <div style={{ display: 'flex', width: '100%' }}>
-            <ProgressBar
-              progress={currentQuestionIndex + 1}
-              quizLength={questions.length}
-              isEndQuiz={endQuiz}
-              progressBarColor={progressBarColor}
-            />
-          </div>
-          <br />
-        </>
-      )}
+
       {timer && !isRunning && (
         <div>
           {appLocale.timerTimeTaken}
@@ -478,13 +504,14 @@ function Core({
                   )}
 
                   <button
-                    onClick={() => { nextQuestion(currentQuestionIndex) }}
+                    onClick={() => { nextQuestion(currentQuestionIndex); setTimeLeft(60); }}
                     className="nextQuestionBtn btn"
                     type="button"
                   >
                     {appLocale.nextQuestionBtn}
                   </button>
                 </div>
+
               )}
             </>
           ) : (
@@ -500,6 +527,33 @@ function Core({
         && renderResult()}
       {endQuiz && !showDefaultResultState && customResultPage !== undefined
         && customResultPage(questionSummary)}
+      {enableProgressBar && (
+        <>
+
+
+          <div style={{ margin: '20px 0', width: '100%', backgroundColor: '#eee', borderRadius: '5px' }}>
+            <div
+              style={{
+                height: '20px',
+                width: `${progressBarWidth}%`,  // Dynamically set width
+                backgroundColor: '#4caf50',  // Green color
+                borderRadius: '5px',
+                transition: 'width 1s ease-out',  // Smooth transition
+              }}
+            ></div>
+          </div>
+
+          {/* <div style={{ display: 'flex', width: '100%', padding: '50px' }}>
+            <ProgressBar
+              progress={currentQuestionIndex + 1}
+              quizLength={questions.length}
+              isEndQuiz={endQuiz}
+              progressBarColor={progressBarColor}
+            />
+          </div> */}
+          <br />
+        </>
+      )}
     </div>
   );
 }
