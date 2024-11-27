@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Quiz from 'react-quiz-component';
 import './Quiz.css';  // Import custom styles for the quiz
 
@@ -110,9 +110,30 @@ const setQuizResult = (obj: any) => {
 }
 
 const Quizpage = () => {
-  
+  const [timeLeft, setTimeLeft] = useState(60); // Timer for each question
+  const [currentQuestion, setCurrentQuestion] = useState(0); // Track the current question
+  useEffect(() => {
+    // Reset timer whenever the question changes
+    setTimeLeft(60);
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(timer); // Clear interval when time runs out
+          // Move to the next question if time runs out
+          if (currentQuestion < quiz.questions.length - 1) {
+            setCurrentQuestion((prev) => prev + 1);
+          }
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer); // Cleanup on unmount or question change
+  }, [currentQuestion]);
+  // Render the progress bar
+  const progressPercentage = (timeLeft / 60) * 100;
   return (
-    <div className='quiz-container flex justify-center items-center pt-10'>
+    <div className='quiz-container flex flex-col justify-center items-center pt-10'>
       <Quiz 
         quiz={quiz} 
         shuffle={true} 
@@ -123,6 +144,9 @@ const Quizpage = () => {
         timer={60}
         enableProgressBar={true}
       />
+      <div className="w-full max-w-2xl bg-gray-200 h-4 rounded-md overflow-hidden mb-4">
+        <div style={{ width: `${progressPercentage}%` }} className="bg-blue-500 h-full"></div>
+      </div>
     </div>
   );
 };

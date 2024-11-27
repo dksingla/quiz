@@ -4,28 +4,5 @@
 .single.selection-tag{
     display: none !important;
 }
-.quiz-options {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .quiz-answer-option {
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-  }
-  
-  .quiz-answer-option input[type="radio"] {
-    margin-right: 10px;
-  }
-  
-  .quiz-answer-option label {
-    font-size: 1rem;
-    cursor: pointer;
-  }
-  
-  .quiz-answer-option input[type="radio"]:checked + label {
-    font-weight: bold;
-    color: #007bff;
-  }
+
   
