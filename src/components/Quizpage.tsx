@@ -9,19 +9,19 @@ const setQuizResult = (obj: any) => {
 }
 
 const Quizpage = () => {
-  const [backgroundColor, setBackgroundColor] = useState('white');
+  const [backgroundColor, setBackgroundColor] = useState('blue');
 
   const handleQuestionSubmit = (obj: { isCorrect: boolean; }) => {
     const newColor = obj.isCorrect === false ? 'red' : 'green';
     setBackgroundColor(newColor);
     setTimeout(() => {
-      setBackgroundColor('white');
+      setBackgroundColor('blue');
     }, 2000);
     console.log('User question results:', obj);
   };
 
   return (
-    <div className='quiz-container w-screen h-screen flex flex-col justify-start items-center pt-20 ' style={{ backgroundColor: backgroundColor, transition: 'background-color 0.3s ease-in-out' }}>
+    <div className='quiz-container w-screen h-screen flex flex-col justify-start items-center pt-20 text-white font-bold' style={{ backgroundColor: backgroundColor, transition: 'background-color 0.3s ease-in-out' }}>
       <Quiz
         quiz={quiz}
         shuffle
