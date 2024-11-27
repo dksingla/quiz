@@ -64,22 +64,7 @@ const quiz = {
             "explanation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
             "point": "30"
         },
-        {
-            "question": "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-            "questionType": "photo",
-            "answerSelectionType": "single",
-            "answers": [
-                "https://dummyimage.com/600x400/000/fff&text=A",
-                "https://dummyimage.com/600x400/000/fff&text=B",
-                "https://dummyimage.com/600x400/000/fff&text=C",
-                "https://dummyimage.com/600x400/000/fff&text=D"
-            ],
-            "correctAnswer": "1",
-            "messageForCorrectAnswer": "Correct answer. Good job.",
-            "messageForIncorrectAnswer": "Incorrect answer. Please try again.",
-            "explanation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            "point": "20"
-        },
+        
 
     ]
 }
