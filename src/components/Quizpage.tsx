@@ -16,7 +16,6 @@ const Quizpage = () => {
   const handleQuestionSubmit = (obj: { isCorrect: boolean }) => {
     const newColor = obj.isCorrect === false ? 'red' : 'green';
     setBackgroundColor(newColor);
-
     setTimeout(() => {
       setBackgroundColor('blue');
     }, 2000);
@@ -32,7 +31,7 @@ const Quizpage = () => {
 
   return (
     <div
-      className="quiz-container w-screen h-screen flex flex-col justify-start items-center pt-20 text-white font-bold"
+      className="quiz-container w-screen h-screen overflow-scroll flex flex-col justify-start items-center pt-20 text-white font-bold"
       style={{ backgroundColor: backgroundColor, transition: 'background-color 0.3s ease-in-out' }}
     >
 

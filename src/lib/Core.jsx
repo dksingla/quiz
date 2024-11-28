@@ -70,7 +70,18 @@ function Core({
   const progressBarWidth = (timeLeft / 60) * 100;
 
 
+  useEffect(() => {
+    if (showNextQuestionButton) {
+      // Set a delay of 2 seconds (2000ms) before calling nextQuestion
+      const timer = setTimeout(() => {
+        nextQuestion(currentQuestionIndex);
+        setTimeLeft(60);
+      }, 2000);
 
+      // Clear the timeout if the component unmounts or showNextQuestionButton changes
+      return () => clearTimeout(timer);
+    }
+  }, [showNextQuestionButton]);
 
 
   useEffect(() => {
@@ -135,16 +146,16 @@ function Core({
     setButtons({});
 
     if (currentQuestionIdx + 1 === questions.length) {
-      if (userInput.length !== questions.length) {
-        alert('Quiz is incomplete');
-      } else if (allowNavigation) {
-        // const submitQuiz = confirm('You have finished all the questions. Submit Quiz now?');
-        // if (submitQuiz) {
-        //   setEndQuiz(true);
-        // }
-      } else {
-        setEndQuiz(true);
-      }
+      // if (userInput.length !== questions.length) {
+      //   alert('Quiz is incomplete');
+      // } else if (allowNavigation) {
+      //   // const submitQuiz = confirm('You have finished all the questions. Submit Quiz now?');
+      //   // if (submitQuiz) {
+      //   //   setEndQuiz(true);
+      //   // }
+      // } else {
+      setEndQuiz(true);
+      // }
     } else {
       setCurrentQuestionIndex(currentQuestionIdx + 1);
     }
@@ -503,13 +514,13 @@ function Core({
                     </button>
                   )}
 
-                  <button
+                  {/* <button
                     onClick={() => { nextQuestion(currentQuestionIndex); setTimeLeft(60); }}
                     className="nextQuestionBtn btn"
                     type="button"
                   >
                     {appLocale.nextQuestionBtn}
-                  </button>
+                  </button> */}
                 </div>
 
               )}
