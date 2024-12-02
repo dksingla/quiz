@@ -7,6 +7,17 @@ import {
   type MRT_PaginationState,
   type MRT_SortingState,
 } from 'material-react-table';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import {
+  Box,
+  Button,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
 
 type Quiz = {
   quizTitle: string;
@@ -22,7 +33,7 @@ type Question = {
   questionType: string;
   questionPic: string | null;
   answerSelectionType: string;
-  answers: Array<string>; // Assuming each answer is a string (just the answer text)
+  answers: Array<string>;
   correctAnswer: string;
   messageForCorrectAnswer: string;
   messageForIncorrectAnswer: string;
@@ -54,7 +65,7 @@ const Example = () => {
       }
 
       try {
-        const url = `http://localhost:4000/quizzes/5?start=${pagination.pageIndex * pagination.pageSize}&size=${pagination.pageSize}&filters=${JSON.stringify(
+        const url = `http://localhost:4000/quizzes/236253?start=${pagination.pageIndex * pagination.pageSize}&size=${pagination.pageSize}&filters=${JSON.stringify(
           columnFilters ?? [],
         )}&globalFilter=${globalFilter ?? ''}&sorting=${JSON.stringify(sorting ?? [])}`;
 
@@ -89,6 +100,20 @@ const Example = () => {
   const columns = useMemo<MRT_ColumnDef<Question>[]>(
     () => [
       {
+        id: 'actions', // Unique identifier for the column
+        header: 'Actions',
+        Cell: ({ row }) => (
+          <Tooltip title="Delete">
+            <IconButton
+              color="error"
+              onClick={() => handleDeleteRow(row.index)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        ),
+      },
+      {
         accessorKey: 'question', // Display the question
         header: 'Question',
       },
@@ -112,9 +137,26 @@ const Example = () => {
         header: 'Answer 4',
         Cell: ({ row }) => <span>{row.original.answers[3]}</span>, // Display the fourth answer
       },
+      // Add a new column for the Delete button
+      
     ],
-    [],
+    []
   );
+
+  const handleDeleteRow = (rowIndex: number) => {
+    // Find the quiz and question to delete by the rowIndex
+    const quizIndex = Math.floor(rowIndex / data[0].questions.length);
+    const questionIndex = rowIndex % data[0].questions.length;
+
+    const updatedData = [...data];
+    updatedData[quizIndex].questions.splice(questionIndex, 1); // Remove the question from the quiz
+
+    if (updatedData[quizIndex].questions.length === 0) {
+      updatedData.splice(quizIndex, 1); // If no questions left in the quiz, remove the quiz itself
+    }
+
+    setData(updatedData);
+  };
 
   const table = useMaterialReactTable({
     columns,
