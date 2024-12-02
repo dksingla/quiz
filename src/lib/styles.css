@@ -1,3 +1,4 @@
+
 .react-quiz-container {
   margin: 20px;
   max-width: 500px;
@@ -30,12 +31,14 @@
   margin-top: 10px;
   margin-bottom: 10px;
   border-radius: 4px;
-  border: 1px solid #e8e8e8;
+  border: 1px solid black;
   font-size: 15px;
   display: block;
   white-space: normal;
   text-align: unset;
 }
+
+
 
 .react-quiz-container .questionWrapper .btn.correct {
   background: green;
@@ -78,16 +81,13 @@
 }
 
 .react-quiz-container .unanswered {
-  background: grey;
+  background: rgb(0, 0, 0);
   color: white;
 }
 
+
 .react-quiz-container .questionWrapper img {
   width: 100%;
-}
-
-.react-quiz-container .answerBtn {
-  /* width: 100%; */
 }
 
 .radio-container {
@@ -95,11 +95,10 @@
   display: flex;
   flex-direction: row;
   gap: 20px;
-  /* justify-content: center; */
   align-items: center;
   justify-items: center;
-  /* margin-bottom: 50px; */
 }
+
 
 .react-quiz-container .selected {
   background: #007bff;
