@@ -10,13 +10,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, IconButton, Tooltip } from '@mui/material';
 
 type Quiz = {
+  quizId: number;
   quizTitle: string;
   quizSynopsis: string;
   questions: Array<Question>;
 };
 
 type Question = {
-  id: string; // Unique identifier for each question
+  questionId: number;
   question: string;
   answers: Array<string>;
 };
@@ -34,12 +35,14 @@ const Example = () => {
     pageSize: 10,
   });
 
+
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
 
       try {
-        const url = `http://localhost:4000/quizzes/236253?start=${pagination.pageIndex * pagination.pageSize}&size=${pagination.pageSize}&filters=${JSON.stringify(
+        const url = `http://localhost:4000/quizzes/379765?start=${pagination.pageIndex * pagination.pageSize}&size=${pagination.pageSize}&filters=${JSON.stringify(
           columnFilters ?? [],
         )}&globalFilter=${globalFilter ?? ''}&sorting=${JSON.stringify(sorting ?? [])}`;
 
@@ -49,7 +52,17 @@ const Example = () => {
         }
 
         const json = await response.json();
-        setData([json.data]);  // Assuming the data is structured as a list of quizzes
+        const quizData = json.data;
+        const mappedData = {
+          ...quizData,
+          questions: quizData.questions.map((question: Question) => ({
+            questionId: question.questionId, // Map backend `questionId` to `id`
+            question: question.question,
+            answers: question.answers,
+          })),
+        };
+
+        setData([mappedData]);
         setRowCount(json.meta.totalRowCount);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -57,7 +70,6 @@ const Example = () => {
         setIsLoading(false);
       }
     };
-
     fetchData();
   }, [
     columnFilters,
@@ -77,7 +89,7 @@ const Example = () => {
           <Tooltip title="Delete">
             <IconButton
               color="error"
-              onClick={() => handleDeleteRow(row.index, row.original.id)} // Delete the question based on its ID
+              onClick={() => handleDeleteRow(row.index, row.original.questionId)} // Delete the question based on its ID
             >
               <DeleteIcon />
             </IconButton>
@@ -113,10 +125,10 @@ const Example = () => {
   );
 
   // Handle row deletion (delete a question by its ID)
-  const handleDeleteRow = async (rowIndex: number, questionId: string) => {
+  const handleDeleteRow = async (rowIndex: number, questionId: number) => {
     try {
-      console.log(questionId);
-      const response = await fetch(`http://localhost:4000/questions/236253/${questionId}`, {
+      console.log('Deleting question with ID:', questionId);
+      const response = await fetch(`http://localhost:4000/questions/379765/${questionId}`, {
         method: 'DELETE',
       });
 
@@ -124,12 +136,17 @@ const Example = () => {
         throw new Error('Failed to delete question');
       }
 
-      // On successful deletion, remove the question from state
-      const updatedData = [...data];
-      updatedData[0].questions = updatedData[0].questions.filter(
-        (question) => question.id !== questionId
-      );
-      setData(updatedData);
+      // Remove the question from state immediately after deletion
+      setData((prevData) => {
+        const updatedData = [...prevData];
+        updatedData[0].questions = updatedData[0].questions.filter(
+          (question) => question.questionId !== questionId
+        );
+        return updatedData;
+      });
+
+      // Update rowCount and pagination state (optional)
+      setRowCount((prevRowCount) => prevRowCount - 1); // Decrement row count
     } catch (error) {
       console.error('Error deleting question:', error);
     }

@@ -2,8 +2,8 @@ import React, {
   useState, useEffect, useCallback, Fragment,
 } from 'react';
 import { nanoid } from 'nanoid';
-import ProgressBar from './core-components/ProgressBar';
-import QuizResultFilter from './core-components/QuizResultFilter';
+// import ProgressBar from './core-components/ProgressBar';
+// import QuizResultFilter from './core-components/QuizResultFilter';
 import { checkAnswer, selectAnswer, rawMarkup } from './core-components/helpers';
 import InstantFeedback from './core-components/InstantFeedback';
 import Explanation from './core-components/Explanation';

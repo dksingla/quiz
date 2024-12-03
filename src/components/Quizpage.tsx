@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Quiz from '../lib/Quiz';
-import quiz from './quizData';
 import ResultPage from './ResultPage';
-
-// Function to handle quiz completion and set the result page
-const setQuizResult = (obj: any) => {
-  // This function can set a state to display the ResultPage
-  return obj;
-};
 
 const Quizpage = () => {
   const [backgroundColor, setBackgroundColor] = useState('blue');
@@ -19,7 +12,7 @@ const Quizpage = () => {
 useEffect(() => {
   const fetchQuizData = async () => {
     try {
-      const response = await fetch('http://localhost:4000/quizzes/620723'); // Replace 1 with your desired quiz ID
+      const response = await fetch('http://localhost:4000/quizzes/379765'); // Replace 1 with your desired quiz ID
       if (!response.ok) {
         throw new Error('Failed to fetch quiz data');
       }
@@ -69,6 +62,8 @@ useEffect(() => {
         <ResultPage obj={quizResult} /> // Display result page if quiz is complete
       ) : loading ? (
         <div>Loading...</div> // Show loading indicator while fetching data
+      ) : !quizData ? (
+        <div className='text-3xl text-red-500 font-light'>Invalid QuizId. This Quiz Didn't exist</div> 
       ) : (
         quizData && (
           <Quiz
