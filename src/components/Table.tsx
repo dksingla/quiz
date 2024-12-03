@@ -1,51 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   MaterialReactTable,
-  useMaterialReactTable,
   type MRT_ColumnDef,
   type MRT_ColumnFiltersState,
   type MRT_PaginationState,
   type MRT_SortingState,
 } from 'material-react-table';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {
-  Box,
-  Button,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 
 type Quiz = {
   quizTitle: string;
   quizSynopsis: string;
-  address: string;
-  state: string;
-  phoneNumber: string;
   questions: Array<Question>;
 };
 
 type Question = {
+  id: string; // Unique identifier for each question
   question: string;
-  questionType: string;
-  questionPic: string | null;
-  answerSelectionType: string;
   answers: Array<string>;
-  correctAnswer: string;
-  messageForCorrectAnswer: string;
-  messageForIncorrectAnswer: string;
-  explanation: string;
-  point: string;
 };
 
 const Example = () => {
   const [data, setData] = useState<Quiz[]>([]);
-  const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isRefetching, setIsRefetching] = useState(false);
   const [rowCount, setRowCount] = useState(0);
 
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([]);
@@ -58,11 +36,7 @@ const Example = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!data.length) {
-        setIsLoading(true);
-      } else {
-        setIsRefetching(true);
-      }
+      setIsLoading(true);
 
       try {
         const url = `http://localhost:4000/quizzes/236253?start=${pagination.pageIndex * pagination.pageSize}&size=${pagination.pageSize}&filters=${JSON.stringify(
@@ -75,15 +49,12 @@ const Example = () => {
         }
 
         const json = await response.json();
-        setData([json.data]);
+        setData([json.data]);  // Assuming the data is structured as a list of quizzes
         setRowCount(json.meta.totalRowCount);
-        setIsError(false);
       } catch (error) {
         console.error('Error fetching data:', error);
-        setIsError(true);
       } finally {
         setIsLoading(false);
-        setIsRefetching(false);
       }
     };
 
@@ -96,17 +67,17 @@ const Example = () => {
     sorting,
   ]);
 
-  // Table columns
+  // Table columns definition
   const columns = useMemo<MRT_ColumnDef<Question>[]>(
     () => [
       {
-        id: 'actions', // Unique identifier for the column
+        id: 'actions', // Column for action buttons like Delete
         header: 'Actions',
         Cell: ({ row }) => (
           <Tooltip title="Delete">
             <IconButton
               color="error"
-              onClick={() => handleDeleteRow(row.index)}
+              onClick={() => handleDeleteRow(row.index, row.original.id)} // Delete the question based on its ID
             >
               <DeleteIcon />
             </IconButton>
@@ -114,82 +85,80 @@ const Example = () => {
         ),
       },
       {
-        accessorKey: 'question', // Display the question
+        accessorKey: 'question', // Display the question text
         header: 'Question',
       },
       {
         accessorKey: 'answers',
         header: 'Answer 1',
-        Cell: ({ row }) => <span>{row.original.answers[0]}</span>, // Display the first answer
+        Cell: ({ row }) => <span>{row.original.answers[0]}</span>,
       },
       {
         accessorKey: 'answers',
         header: 'Answer 2',
-        Cell: ({ row }) => <span>{row.original.answers[1]}</span>, // Display the second answer
+        Cell: ({ row }) => <span>{row.original.answers[1]}</span>,
       },
       {
         accessorKey: 'answers',
         header: 'Answer 3',
-        Cell: ({ row }) => <span>{row.original.answers[2]}</span>, // Display the third answer
+        Cell: ({ row }) => <span>{row.original.answers[2]}</span>,
       },
       {
         accessorKey: 'answers',
         header: 'Answer 4',
-        Cell: ({ row }) => <span>{row.original.answers[3]}</span>, // Display the fourth answer
+        Cell: ({ row }) => <span>{row.original.answers[3]}</span>,
       },
-      // Add a new column for the Delete button
-      
     ],
     []
   );
 
-  const handleDeleteRow = (rowIndex: number) => {
-    // Find the quiz and question to delete by the rowIndex
-    const quizIndex = Math.floor(rowIndex / data[0].questions.length);
-    const questionIndex = rowIndex % data[0].questions.length;
+  // Handle row deletion (delete a question by its ID)
+  const handleDeleteRow = async (rowIndex: number, questionId: string) => {
+    try {
+      console.log(questionId);
+      const response = await fetch(`http://localhost:4000/questions/236253/${questionId}`, {
+        method: 'DELETE',
+      });
 
-    const updatedData = [...data];
-    updatedData[quizIndex].questions.splice(questionIndex, 1); // Remove the question from the quiz
+      if (!response.ok) {
+        throw new Error('Failed to delete question');
+      }
 
-    if (updatedData[quizIndex].questions.length === 0) {
-      updatedData.splice(quizIndex, 1); // If no questions left in the quiz, remove the quiz itself
+      // On successful deletion, remove the question from state
+      const updatedData = [...data];
+      updatedData[0].questions = updatedData[0].questions.filter(
+        (question) => question.id !== questionId
+      );
+      setData(updatedData);
+    } catch (error) {
+      console.error('Error deleting question:', error);
     }
-
-    setData(updatedData);
   };
 
-  const table = useMaterialReactTable({
-    columns,
-    data: data.flatMap((quiz) => quiz.questions), // Flatten quiz data to get the questions for each quiz
-    enableRowSelection: true,
-    getRowId: (row) => row.question, // Use question text as row ID (or some other unique identifier)
-    initialState: { showColumnFilters: true },
-    manualFiltering: true,
-    manualPagination: true,
-    manualSorting: true,
-    muiToolbarAlertBannerProps: isError
-      ? {
-          color: 'error',
-          children: 'Error loading data',
-        }
-      : undefined,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    rowCount,
-    state: {
-      columnFilters,
-      globalFilter,
-      isLoading,
-      pagination,
-      showAlertBanner: isError,
-      showProgressBars: isRefetching,
-      sorting,
-    },
-  });
-
-  return <MaterialReactTable table={table} />;
+  return (
+    <Box>
+      <MaterialReactTable
+        columns={columns}
+        data={data.flatMap((quiz) => quiz.questions)} // Flatten the questions array to display in the table
+        // isLoading={isLoading}
+        manualPagination
+        manualFiltering
+        manualSorting
+        rowCount={rowCount}
+        onPaginationChange={setPagination}
+        onSortingChange={setSorting}
+        onColumnFiltersChange={setColumnFilters}
+        onGlobalFilterChange={setGlobalFilter}
+        state={{
+          columnFilters,
+          globalFilter,
+          isLoading,
+          pagination,
+          sorting,
+        }}
+      />
+    </Box>
+  );
 };
 
 export default Example;
