@@ -48,32 +48,36 @@ const Admin = () => {
       </div>
 
       {/* Table for quizzes */}
-      <div className="overflow-x-auto">
-        <table className="table-auto border-collapse border border-gray-300 w-full">
-          <thead>
-            <tr>
-              <th className="border border-gray-300 px-4 py-2">Quiz Title</th>
-              <th className="border border-gray-300 px-4 py-2">Quiz Synopsis</th>
-              <th className="border border-gray-300 px-4 py-2">No. of Questions</th>
-              <th className="border border-gray-300 px-4 py-2">ID</th>
-              <th className="border border-gray-300 px-4 py-2">Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {quizzes.map((quiz) => (
-              <tr key={quiz.id}>
-                <td className="border border-gray-300 px-4 py-2">{quiz.quizTitle}</td>
-                <td className="border border-gray-300 px-4 py-2">{quiz.quizSynopsis}</td>
-                <td className="border border-gray-300 px-4 py-2">{quiz.nrOfQuestions}</td>
-                <td className="border border-gray-300 px-4 py-2">{quiz.id}</td>
-                <td className="border border-gray-300 px-4 py-2">
-                  <a href={`/table/${quiz.id}`} className="text-blue-500">Open</a>
-                </td>
+      {
+        quizzes.length > 0 &&
+
+        <div className="overflow-x-auto">
+          <table className="table-auto border-collapse border border-gray-300 w-full">
+            <thead>
+              <tr>
+                <th className="border border-gray-300 px-4 py-2">Quiz Title</th>
+                <th className="border border-gray-300 px-4 py-2">Quiz Synopsis</th>
+                <th className="border border-gray-300 px-4 py-2">No. of Questions</th>
+                <th className="border border-gray-300 px-4 py-2">ID</th>
+                <th className="border border-gray-300 px-4 py-2">Details</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {quizzes.map((quiz) => (
+                <tr key={quiz.id}>
+                  <td className="border border-gray-300 px-4 py-2">{quiz.quizTitle}</td>
+                  <td className="border border-gray-300 px-4 py-2">{quiz.quizSynopsis}</td>
+                  <td className="border border-gray-300 px-4 py-2">{quiz.nrOfQuestions}</td>
+                  <td className="border border-gray-300 px-4 py-2">{quiz.id}</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    <a href={`/table/${quiz.id}`} className="text-blue-500">Open</a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      }
     </div>
   );
 }
