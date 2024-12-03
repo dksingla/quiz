@@ -17,6 +17,7 @@ useEffect(() => {
         throw new Error('Failed to fetch quiz data');
       }
       const data = await response.json();
+      console.log(data.data)
       setQuizData(data.data); // Set the fetched quiz data to state
       setLoading(false); // Set loading to false when data is fetched
     } catch (error) {

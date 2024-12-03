@@ -7,8 +7,10 @@ import {
   type MRT_SortingState,
 } from 'material-react-table';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Box, IconButton, Tooltip } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import { Box, FormControl, FormControlLabel, FormLabel, IconButton, Radio, RadioGroup, Tooltip } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from '@mui/material';
 
 type Quiz = {
   quizId: number;
@@ -21,6 +23,7 @@ type Question = {
   questionId: number;
   question: string;
   answers: Array<string>;
+  correctAnswer: string;  // Correct answer is now a string (the text of the correct answer)
 };
 
 const Example = () => {
@@ -37,8 +40,11 @@ const Example = () => {
     pageSize: 10,
   });
 
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [editedQuestionText, setEditedQuestionText] = useState<string>('');
+  const [editedAnswers, setEditedAnswers] = useState<string[]>(['', '', '', '']);
 
-
+  // Fetch data for the table
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -61,6 +67,7 @@ const Example = () => {
             questionId: question.questionId, // Map backend `questionId` to `id`
             question: question.question,
             answers: question.answers,
+            correctAnswer: question.correctAnswer,
           })),
         };
 
@@ -85,18 +92,35 @@ const Example = () => {
   const columns = useMemo<MRT_ColumnDef<Question>[]>(
     () => [
       {
-        id: 'actions', // Column for action buttons like Delete
+        id: 'actions',
         header: 'Actions',
         Cell: ({ row }) => (
-          <Tooltip title="Delete">
-            <IconButton
-              color="error"
-              onClick={() => handleDeleteRow(row.index, row.original.questionId)} // Delete the question based on its ID
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <Tooltip title="Edit">
+              <IconButton
+                color="primary"
+                onClick={() => handleEditRow(row.original)} // Pass the question data for editing
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton
+                color="error"
+                onClick={() => handleDeleteRow(row.index, row.original.questionId)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
         ),
+      },
+      {
+        accessorKey: 'correctAnswer',
+        header: 'Correct Answer',
+        Cell: ({ row }) => {
+          return <span>{row.original.correctAnswer}</span>;  // Directly display the correct answer (text)
+        },
       },
       {
         accessorKey: 'question', // Display the question text
@@ -129,7 +153,6 @@ const Example = () => {
   // Handle row deletion (delete a question by its ID)
   const handleDeleteRow = async (rowIndex: number, questionId: number) => {
     try {
-      console.log('Deleting question with ID:', questionId);
       const response = await fetch(`http://localhost:4000/questions/${quizId}/${questionId}`, {
         method: 'DELETE',
       });
@@ -147,19 +170,73 @@ const Example = () => {
         return updatedData;
       });
 
-      // Update rowCount and pagination state (optional)
       setRowCount((prevRowCount) => prevRowCount - 1); // Decrement row count
     } catch (error) {
       console.error('Error deleting question:', error);
     }
   };
 
+  // Handle row edit
+  const handleEditRow = (question: Question) => {
+    setEditingQuestion(question);
+    setEditedQuestionText(question.question);
+    setEditedAnswers(question.answers);
+  };
+
+  // Save the updated question
+  const handleSaveEdit = async () => {
+    if (editingQuestion) {
+      try {
+        const updatedQuestion = {
+          ...editingQuestion,
+          question: editedQuestionText,
+          answers: editedAnswers,
+          correctAnswerText: editingQuestion.correctAnswer, // Send the correct answer text
+        };
+
+        const response = await fetch(`http://localhost:4000/questions/${quizId}/${editingQuestion.questionId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedQuestion),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update question');
+        }
+
+        setData((prevData) => {
+          const updatedData = [...prevData];
+          const questionIndex = updatedData[0].questions.findIndex(
+            (q) => q.questionId === editingQuestion.questionId
+          );
+          updatedData[0].questions[questionIndex] = updatedQuestion;
+          return updatedData;
+        });
+
+        setEditingQuestion(null);
+        setEditedQuestionText('');
+        setEditedAnswers(['', '', '', '']);
+      } catch (error) {
+        console.error('Error updating question:', error);
+      }
+    }
+  };
+
+
+
+  // Close the edit dialog without saving
+  const handleCloseEditDialog = () => {
+    setEditingQuestion(null);
+    setEditedQuestionText('');
+    setEditedAnswers(['', '', '', '']);
+  };
+
   return (
     <Box>
+      {/* Table */}
       <MaterialReactTable
         columns={columns}
         data={data.flatMap((quiz) => quiz.questions)} // Flatten the questions array to display in the table
-        // isLoading={isLoading}
         manualPagination
         manualFiltering
         manualSorting
@@ -176,6 +253,69 @@ const Example = () => {
           sorting,
         }}
       />
+
+      {/* Dialog Box for Edit */}
+      {editingQuestion && (
+        // Inside your Dialog (Edit Question) component:
+        <Dialog open={true} onClose={handleCloseEditDialog}>
+          <DialogTitle>Edit Question</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Question"
+              fullWidth
+              value={editedQuestionText}
+              onChange={(e) => setEditedQuestionText(e.target.value)}
+              margin="normal"
+            />
+
+            {/* Answers Inputs */}
+            {editedAnswers.map((answer, index) => (
+              <TextField
+                key={index}
+                label={`Answer ${index + 1}`}
+                fullWidth
+                value={editedAnswers[index]}
+                onChange={(e) => {
+                  const newAnswers = [...editedAnswers];
+                  newAnswers[index] = e.target.value;
+                  setEditedAnswers(newAnswers);
+                }}
+                margin="normal"
+              />
+            ))}
+
+            {/* Correct Answer Selection */}
+            <FormControl component="fieldset" margin="normal">
+              <FormLabel component="legend">Correct Answer</FormLabel>
+              <RadioGroup
+                value={editingQuestion.correctAnswer}  // The actual answer text
+                onChange={(e) => setEditingQuestion({
+                  ...editingQuestion,
+                  correctAnswer: e.target.value,  // Update with the selected answer text
+                })}
+              >
+                {editedAnswers.map((answer, index) => (
+                  <FormControlLabel
+                    key={index}
+                    value={answer}  // Use the answer text as the value
+                    control={<Radio />}
+                    label={`Answer ${index + 1}`}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseEditDialog} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEdit} color="primary">
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+      )}
     </Box>
   );
 };
