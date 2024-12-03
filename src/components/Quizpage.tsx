@@ -12,7 +12,7 @@ const Quizpage = () => {
 useEffect(() => {
   const fetchQuizData = async () => {
     try {
-      const response = await fetch('http://localhost:4000/quizzes/379765'); // Replace 1 with your desired quiz ID
+      const response = await fetch('http://localhost:4000/quizzes/872144'); // Replace 1 with your desired quiz ID
       if (!response.ok) {
         throw new Error('Failed to fetch quiz data');
       }

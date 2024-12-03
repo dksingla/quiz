@@ -8,6 +8,7 @@ import {
 } from 'material-react-table';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, IconButton, Tooltip } from '@mui/material';
+import { useParams } from 'react-router-dom';
 
 type Quiz = {
   quizId: number;
@@ -23,6 +24,7 @@ type Question = {
 };
 
 const Example = () => {
+  const { quizId } = useParams();
   const [data, setData] = useState<Quiz[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [rowCount, setRowCount] = useState(0);
@@ -42,7 +44,7 @@ const Example = () => {
       setIsLoading(true);
 
       try {
-        const url = `http://localhost:4000/quizzes/379765?start=${pagination.pageIndex * pagination.pageSize}&size=${pagination.pageSize}&filters=${JSON.stringify(
+        const url = `http://localhost:4000/quizzes/${quizId}?start=${pagination.pageIndex * pagination.pageSize}&size=${pagination.pageSize}&filters=${JSON.stringify(
           columnFilters ?? [],
         )}&globalFilter=${globalFilter ?? ''}&sorting=${JSON.stringify(sorting ?? [])}`;
 
@@ -128,7 +130,7 @@ const Example = () => {
   const handleDeleteRow = async (rowIndex: number, questionId: number) => {
     try {
       console.log('Deleting question with ID:', questionId);
-      const response = await fetch(`http://localhost:4000/questions/379765/${questionId}`, {
+      const response = await fetch(`http://localhost:4000/questions/${quizId}/${questionId}`, {
         method: 'DELETE',
       });
 

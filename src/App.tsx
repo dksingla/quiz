@@ -25,7 +25,7 @@ const router = createBrowserRouter([
     element: <Admin />,
   },
   {
-    path: "/table",
+    path: "/table/:quizId",
     element: <Example/>
   }
 ]);

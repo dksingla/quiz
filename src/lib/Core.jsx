@@ -29,7 +29,7 @@ function Core({
   const [filteredValue, setFilteredValue] = useState('all');
   const [userAttempt, setUserAttempt] = useState(1);
   const [showDefaultResultState, setShowDefaultResult] = useState(true);
-  const [answerSelectionTypeState, setAnswerSelectionType] = useState(undefined);
+  // const [answerSelectionTypeState, setAnswerSelectionType] = useState(undefined);
 
   const [totalPoints, setTotalPoints] = useState(0);
   const [correctPoints, setCorrectPoints] = useState(0);
@@ -42,7 +42,29 @@ function Core({
 
   // progressbartiming logic
   const [timeLeft, setTimeLeft] = useState(60);
-  const [quizCompleted, setQuizCompleted] = useState(false);
+  // const [quizCompleted, setQuizCompleted] = useState(false);
+
+  const nextQuestion = useCallback( (currentQuestionIdx) => {
+    setIncorrectAnswer(false);
+    setIsCorrect(false);
+    setShowNextQuestionButton(false);
+    setButtons({});
+
+    if (currentQuestionIdx + 1 === questions.length) {
+      // if (userInput.length !== questions.length) {
+      //   alert('Quiz is incomplete');
+      // } else if (allowNavigation) {
+      //   // const submitQuiz = confirm('You have finished all the questions. Submit Quiz now?');
+      //   // if (submitQuiz) {
+      //   //   setEndQuiz(true);
+      //   // }
+      // } else {
+      setEndQuiz(true);
+      // }
+    } else {
+      setCurrentQuestionIndex(currentQuestionIdx + 1);
+    }
+  },[questions.length]);
 
   // Start the timer when the component mounts
   useEffect(() => {
@@ -64,7 +86,7 @@ function Core({
 
     // Cleanup the interval on unmount or when timeLeft changes
     return () => clearInterval(timer);
-  }, [timeLeft]); // Re-run effect when timeLeft changes
+  }, [timeLeft, currentQuestionIndex, nextQuestion]); // Re-run effect when timeLeft changes
 
   // Calculate progress bar width based on timeLeft
   const progressBarWidth = (timeLeft / 60) * 100;
@@ -81,7 +103,7 @@ function Core({
       // Clear the timeout if the component unmounts or showNextQuestionButton changes
       return () => clearTimeout(timer);
     }
-  }, [showNextQuestionButton]);
+  }, [showNextQuestionButton, currentQuestionIndex, nextQuestion]);
 
 
   useEffect(() => {
@@ -92,11 +114,11 @@ function Core({
     setActiveQuestion(questions[currentQuestionIndex]);
   }, [currentQuestionIndex, questions]);
 
-  useEffect(() => {
-    const { answerSelectionType } = activeQuestion;
-    // Default single to avoid code breaking due to automatic version upgrade
-    setAnswerSelectionType(answerSelectionType || 'single');
-  }, [activeQuestion, currentQuestionIndex]);
+  // useEffect(() => {
+  //   const { answerSelectionType } = activeQuestion;
+  //   // Default single to avoid code breaking due to automatic version upgrade
+  //   // setAnswerSelectionType(answerSelectionType || 'single');
+  // }, [activeQuestion, currentQuestionIndex]);
 
   useEffect(() => {
     if (endQuiz) {
@@ -118,7 +140,7 @@ function Core({
       setTotalPoints(totalPointsTemp);
       setCorrectPoints(correctPointsTemp);
     }
-  }, [endQuiz]);
+  }, [endQuiz, correct, questions]);
 
   useEffect(() => {
     setQuestionSummary({
@@ -139,27 +161,7 @@ function Core({
     }
   }, [questionSummary]);
 
-  const nextQuestion = (currentQuestionIdx) => {
-    setIncorrectAnswer(false);
-    setIsCorrect(false);
-    setShowNextQuestionButton(false);
-    setButtons({});
-
-    if (currentQuestionIdx + 1 === questions.length) {
-      // if (userInput.length !== questions.length) {
-      //   alert('Quiz is incomplete');
-      // } else if (allowNavigation) {
-      //   // const submitQuiz = confirm('You have finished all the questions. Submit Quiz now?');
-      //   // if (submitQuiz) {
-      //   //   setEndQuiz(true);
-      //   // }
-      // } else {
-      setEndQuiz(true);
-      // }
-    } else {
-      setCurrentQuestionIndex(currentQuestionIdx + 1);
-    }
-  };
+  
 
   const handleChange = (event) => {
     setFilteredValue(event.target.value);
